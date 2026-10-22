@@ -17,17 +17,28 @@ class I18n {
   }
 
   detectLocale() {
-    // 获取系统语言环境
-    const systemLocale = process.env.LANG || process.env.LC_ALL || process.env.LC_MESSAGES || 'en';
-
-    // 提取语言代码 (例如：zh_CN.UTF-8 -> zh, en_US.UTF-8 -> en)
-    const languageCode = systemLocale.split('_')[0].split('.')[0].toLowerCase();
-
-    // 支持的语言列表
     const supportedLanguages = ['zh', 'en'];
+    let languageCode = null;
 
-    // 如果系统语言在支持列表中，使用系统语言，否则使用英文
-    this.currentLocale = supportedLanguages.includes(languageCode) ? languageCode : 'en';
+    // 1. 环境变量优先（仅作为手动覆盖手段，日常使用无需设置）
+    const envLocale = process.env.LANG || process.env.LC_ALL || process.env.LC_MESSAGES;
+    if (envLocale) {
+      // 提取语言代码 (例如：zh_CN.UTF-8 -> zh, en_US.UTF-8 -> en)
+      languageCode = envLocale.split('_')[0].split('.')[0].toLowerCase();
+    } else {
+      // 2. 无环境变量时直接读取系统区域设置（如 zh-CN、en-US），Windows 下也有效
+      try {
+        const systemLocale = Intl.DateTimeFormat().resolvedOptions().locale || '';
+        languageCode = systemLocale.split('-')[0].toLowerCase();
+      } catch (error) {
+        languageCode = null;
+      }
+    }
+
+    // 3. 默认使用中文
+    this.currentLocale = languageCode && supportedLanguages.includes(languageCode)
+      ? languageCode
+      : 'zh';
   }
 
   loadTranslations() {

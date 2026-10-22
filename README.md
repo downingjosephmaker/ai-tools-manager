@@ -90,17 +90,19 @@ Tools are npm packages by default. For tools that are **not distributed via npm*
 
 ATM supports multiple languages and automatically detects your system language:
 
-- **Chinese (zh)**: 中文界面，自动检测中文系统环境
-- **English (en)**: English interface, default fallback language
+- **Chinese (zh)**: 中文界面，默认语言 (default)
+- **English (en)**: English interface, available via manual override
 
 ### Language Detection
 
-The application automatically detects your system language from environment variables:
-- `LANG`
-- `LC_ALL`
-- `LC_MESSAGES`
+The application detects the display language in this order:
 
-If your system language is not supported, it defaults to English.
+1. Environment variables (manual override only, not required for daily use):
+   - `LANG`
+   - `LC_ALL`
+   - `LC_MESSAGES`
+2. The operating system locale (e.g. `zh-CN`, `en-US`) — works on Windows too, no environment variables needed
+3. Fallback: Chinese (zh)
 
 ### Supported Languages
 
