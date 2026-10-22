@@ -6,14 +6,9 @@
       "description": "Anthropic's official CLI for Claude AI"
     },
     {
-      "name": "Qwen Code",
-      "package": "@qwen-code/qwen-code",
-      "description": "Qwen AI development tools"
-    },
-    {
-      "name": "Code Buddy",
-      "package": "@tencent-ai/codebuddy-code",
-      "description": "Tencent AI code assistant"
+      "name": "Codex",
+      "package": "@openai/codex",
+      "description": "OpenAI Codex CLI tool"
     },
     {
       "name": "Gemini CLI",
@@ -21,29 +16,19 @@
       "description": "Google Gemini AI command line interface"
     },
     {
-      "name": "Auggie",
-      "package": "@augmentcode/auggie",
-      "description": "AI-powered code augmentation tool"
+      "name": "Antigravity ACP",
+      "package": "antigravity-acp",
+      "description": "ACP server for Google Antigravity's agy CLI"
     },
     {
-      "name": "Crush",
-      "package": "@charmland/crush",
-      "description": "Charmland development tool"
+      "name": "GLM Coding Agent",
+      "package": "glm-acp-agent",
+      "description": "Z.ai (Zhipu) GLM Coding Plan ACP coding agent"
     },
     {
-      "name": "Codex",
-      "package": "@openai/codex",
-      "description": "OpenAI Codex CLI tool"
-    },
-    {
-      "name": "iFlow",
-      "package": "@iflow-ai/iflow-cli",
-      "description": "iFlow AI development CLI"
-    },
-    {
-      "name": "OpenCode",
-      "package": "opencode-ai",
-      "description": "AI coding agent, built for the terminal."
+      "name": "Grok Build",
+      "package": "@xai-official/grok",
+      "description": "xAI's official Grok coding agent CLI"
     },
     {
       "name": "Copilot CLI",
@@ -51,9 +36,14 @@
       "description": "GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal."
     },
     {
-      "name": "Kode",
-      "package": "@shareai-lab/kode",
-      "description": "Kode - 终端 AI 助手"
+      "name": "OpenCode",
+      "package": "opencode-ai",
+      "description": "AI coding agent, built for the terminal."
+    },
+    {
+      "name": "Qwen Code",
+      "package": "@qwen-code/qwen-code",
+      "description": "Qwen AI development tools"
     }
   ]
 }

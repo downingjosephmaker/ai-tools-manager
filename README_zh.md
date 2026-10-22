@@ -56,15 +56,14 @@ atm
 目前支持以下AI开发工具：
 
 - **Claude Code** - Anthropic官方Claude AI命令行工具
-- **Qwen Code** - 通义千问AI开发工具
-- **Code Buddy** - 腾讯AI代码助手
-- **Gemini CLI** - Google Gemini AI命令行接口
-- **Auggie** - AI驱动的代码增强工具
-- **Crush** - Charmland开发工具
 - **Codex** - OpenAI Codex命令行工具
-- **iFlow** - iFlow AI开发命令行工具
-- **OpenCode** - 为终端而生的AI编程代理
+- **Gemini CLI** - Google Gemini AI命令行接口
+- **Antigravity ACP** - Google Antigravity（agy CLI）的 ACP 服务器
+- **GLM Coding Agent** - 智谱 Z.ai GLM Coding Plan ACP 编程代理
+- **Grok Build** - xAI 官方 Grok 终端编程代理
 - **Copilot CLI** - GitHub Copilot命令行工具，将Copilot编程代理的强大功能直接带到您的终端
+- **OpenCode** - 为终端而生的AI编程代理
+- **Qwen Code** - 通义千问AI开发工具
 
 ## 配置
 

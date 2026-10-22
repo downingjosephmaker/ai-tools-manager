@@ -56,15 +56,14 @@ The application will present an interactive menu where you can:
 The following AI development tools are supported:
 
 - **Claude Code** - Anthropic's official CLI for Claude AI
-- **Qwen Code** - Qwen AI development tools
-- **Code Buddy** - Tencent AI code assistant
-- **Gemini CLI** - Google Gemini AI command line interface
-- **Auggie** - AI-powered code augmentation tool
-- **Crush** - Charmland development tool
 - **Codex** - OpenAI Codex CLI tool
-- **iFlow** - iFlow AI development CLI
-- **OpenCode** - AI coding agent, built for the terminal
+- **Gemini CLI** - Google Gemini AI command line interface
+- **Antigravity ACP** - ACP server for Google Antigravity's `agy` CLI
+- **GLM Coding Agent** - Z.ai (Zhipu) GLM Coding Plan ACP coding agent
+- **Grok Build** - xAI's official Grok coding agent CLI
 - **Copilot CLI** - GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal
+- **OpenCode** - AI coding agent, built for the terminal
+- **Qwen Code** - Qwen AI development tools
 
 ## Configuration
 
