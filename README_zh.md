@@ -33,6 +33,8 @@
    npm install -g .
    ```
 
+   > **提示**：新版 npm 这样装出来的是一个指向源码目录的**符号链接**——目录一旦移动或删除，全局 `atm` 命令就会失效。想要独立拷贝，请看下文"高级用法"里的*本地离线安装*。
+
 4. 验证安装：
    ```bash
    atm
@@ -120,6 +122,44 @@ ATM_SKIP_VERSION_CHECK=true atm
 ```
 
 这对于自动化脚本或网络问题时很有用。
+
+### 本地离线安装（Windows / PowerShell）
+
+新版 npm 下 `npm install -g .` 装出来的是一个指向源码目录的**符号链接**——目录一旦移动或删除，全局 `atm` 命令就会失效。改用 tarball 安装则一定是真实、独立的拷贝；`--offline` 让安装完全走本地 npm 缓存，不会卡在联网请求（审计、registry 元数据）上。
+
+项目自带一键脚本，会自动完成：卸载旧全局安装（含失效符号链接）→ 打包源码 → 离线安装（本地缓存不全时自动回退联网）→ 验证 → 清理：
+
+```powershell
+cd I:\ProjectSynthesis\ai-tools-manager
+.\install-offline.ps1
+
+# 如果被执行策略拦截：
+powershell -ExecutionPolicy Bypass -File .\install-offline.ps1
+```
+
+手动等价步骤（即脚本逐行做的事）：
+
+```powershell
+npm uninstall -g ai-tools-manager
+cd I:\ProjectSynthesis\ai-tools-manager
+npm pack --pack-destination .
+$tgz = (Get-ChildItem .\ai-tools-manager-*.tgz | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+npm install -g $tgz --no-audit --no-fund --offline   # 缓存不全可去掉 --offline 联网安装
+npm ls -g ai-tools-manager
+Remove-Item .\ai-tools-manager-*.tgz
+```
+
+Git Bash / Linux / macOS 等价命令（`<version>` 替换为实际版本号，如 `1.3.0`）：
+
+```bash
+cd /path/to/ai-tools-manager
+npm pack --pack-destination .
+npm install -g ./ai-tools-manager-<version>.tgz --no-audit --no-fund --offline
+npm ls -g ai-tools-manager
+rm ./ai-tools-manager-*.tgz
+```
+
+> **说明**：`--offline` 要求依赖（chalk、inquirer、ora）已存在于本地 npm 缓存。如果 npm 提示缓存缺失，去掉 `--offline` 参数联网安装即可——自带脚本会自动完成这个回退。
 
 ## 系统要求
 

@@ -33,6 +33,8 @@
    npm install -g .
    ```
 
+   > **Tip**: On modern npm this installs a **symlink** to the source folder — if the folder is later moved or deleted, the global `atm` command breaks. For a standalone copy, see *Local Offline Installation* under Advanced Usage below.
+
 4. Verify installation:
    ```bash
    atm
@@ -120,6 +122,44 @@ ATM_SKIP_VERSION_CHECK=true atm
 ```
 
 This can be useful for automated scripts or if you're experiencing network issues.
+
+### Local Offline Installation (Windows / PowerShell)
+
+`npm install -g .` on modern npm installs a **symlink** to the source folder — once the folder is moved or deleted, the global `atm` command breaks. Installing from a packed tarball always produces a real, standalone copy, and `--offline` resolves everything from the local npm cache so the install never stalls on network requests (audit, registry metadata).
+
+The bundled script does everything for you — it removes the previous global install (including stale symlinks), packs the source, installs fully offline (falling back to online automatically if the local cache is incomplete), verifies, and cleans up:
+
+```powershell
+cd I:\ProjectSynthesis\ai-tools-manager
+.\install-offline.ps1
+
+# If blocked by execution policy:
+powershell -ExecutionPolicy Bypass -File .\install-offline.ps1
+```
+
+Manual equivalent (what the script does step by step):
+
+```powershell
+npm uninstall -g ai-tools-manager
+cd I:\ProjectSynthesis\ai-tools-manager
+npm pack --pack-destination .
+$tgz = (Get-ChildItem .\ai-tools-manager-*.tgz | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+npm install -g $tgz --no-audit --no-fund --offline   # drop --offline to allow network
+npm ls -g ai-tools-manager
+Remove-Item .\ai-tools-manager-*.tgz
+```
+
+Git Bash / Linux / macOS equivalent (replace `<version>` with the packed version, e.g. `1.3.0`):
+
+```bash
+cd /path/to/ai-tools-manager
+npm pack --pack-destination .
+npm install -g ./ai-tools-manager-<version>.tgz --no-audit --no-fund --offline
+npm ls -g ai-tools-manager
+rm ./ai-tools-manager-*.tgz
+```
+
+> **Note**: `--offline` requires the dependencies (chalk, inquirer, ora) to already be in the local npm cache. If npm reports missing cache entries, simply drop the `--offline` flag and let it reach the registry — the bundled script does this fallback automatically.
 
 ## Requirements
 
