@@ -60,7 +60,7 @@ atm
 - **Claude Code** - Anthropic官方Claude AI命令行工具
 - **Codex** - OpenAI Codex命令行工具
 - **Gemini CLI** - Google Gemini AI命令行接口
-- **Antigravity ACP** - Google Antigravity（agy CLI）的 ACP 服务器
+- **Antigravity ACP** - Google Antigravity（agy CLI）的 ACP 服务器（依赖 bun：`npm install -g bun`）
 - **Antigravity CLI** - Google Antigravity 命令行（agy），command 类型管理（官方安装器 + `agy update`，非 npm）
 - **GLM Coding Agent** - 智谱 Z.ai GLM Coding Plan ACP 编程代理
 - **Grok Build** - xAI 官方 Grok 终端编程代理

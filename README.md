@@ -60,7 +60,7 @@ The following AI development tools are supported:
 - **Claude Code** - Anthropic's official CLI for Claude AI
 - **Codex** - OpenAI Codex CLI tool
 - **Gemini CLI** - Google Gemini AI command line interface
-- **Antigravity ACP** - ACP server for Google Antigravity's `agy` CLI
+- **Antigravity ACP** - ACP server for Google Antigravity's `agy` CLI (requires bun: `npm install -g bun`)
 - **Antigravity CLI** - Google Antigravity CLI (`agy`), managed via command type (official installer + `agy update`, not npm)
 - **GLM Coding Agent** - Z.ai (Zhipu) GLM Coding Plan ACP coding agent
 - **Grok Build** - xAI's official Grok coding agent CLI

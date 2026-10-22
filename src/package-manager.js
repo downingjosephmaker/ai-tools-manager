@@ -39,7 +39,11 @@ class PackageManager {
 
   async installPackage(packageName) {
     try {
-      const { stdout, stderr } = await execAsync(`npm install -g ${packageName}`);
+      // --no-audit --no-fund 跳过联网审计/元数据请求，弱网环境下会无限卡住安装
+      const { stdout, stderr } = await execAsync(
+        `npm install -g ${packageName} --no-audit --no-fund`,
+        { timeout: 600000 }
+      );
       return { success: true, output: stdout + stderr };
     } catch (error) {
       return { success: false, error: error.message };
@@ -48,7 +52,10 @@ class PackageManager {
 
   async updatePackage(packageName) {
     try {
-      const { stdout, stderr } = await execAsync(`npm update -g ${packageName}`);
+      const { stdout, stderr } = await execAsync(
+        `npm update -g ${packageName} --no-audit --no-fund`,
+        { timeout: 600000 }
+      );
       return { success: true, output: stdout + stderr };
     } catch (error) {
       return { success: false, error: error.message };
@@ -58,7 +65,9 @@ class PackageManager {
   async uninstallPackage(packageName) {
     try {
       const cleanPackageName = this.extractPackageName(packageName);
-      const { stdout, stderr } = await execAsync(`npm uninstall -g ${cleanPackageName}`);
+      const { stdout, stderr } = await execAsync(`npm uninstall -g ${cleanPackageName}`, {
+        timeout: 300000
+      });
       return { success: true, output: stdout + stderr };
     } catch (error) {
       return { success: false, error: error.message };

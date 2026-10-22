@@ -18,7 +18,7 @@
     {
       "name": "Antigravity ACP",
       "package": "antigravity-acp",
-      "description": "ACP server for Google Antigravity's agy CLI"
+      "description": "ACP server for Google Antigravity's agy CLI (requires bun: npm install -g bun)"
     },
     {
       "name": "Antigravity CLI",
