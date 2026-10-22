@@ -61,6 +61,7 @@ atm
 - **Codex** - OpenAI Codex命令行工具
 - **Gemini CLI** - Google Gemini AI命令行接口
 - **Antigravity ACP** - Google Antigravity（agy CLI）的 ACP 服务器
+- **Antigravity CLI** - Google Antigravity 命令行（agy），command 类型管理（官方安装器 + `agy update`，非 npm）
 - **GLM Coding Agent** - 智谱 Z.ai GLM Coding Plan ACP 编程代理
 - **Grok Build** - xAI 官方 Grok 终端编程代理
 - **Copilot CLI** - GitHub Copilot命令行工具，将Copilot编程代理的强大功能直接带到您的终端
@@ -76,6 +77,14 @@ atm
 - `description`: 工具的简要描述
 
 要添加新工具，请编辑配置文件并在 `tools` 数组中添加新条目。
+
+工具默认按 npm 包管理。对于**不走 npm 分发**的工具（如 Antigravity CLI），使用 `command` 类型及以下可选字段：
+
+- `type`：`"command"` —— 启用非 npm 方式管理
+- `versionCommand`：用于检测工具是否安装（退出码 0 即已安装）并读取版本号
+- `installCommand`：（可选）安装命令；未配置则不出现在安装列表
+- `updateCommand`：（可选）更新命令；因无法预知最新版本号，更新菜单里显示为"检查并更新"
+- `uninstallCommand`：（可选）卸载命令；未配置则不支持通过 ATM 卸载
 
 ## 本地化
 

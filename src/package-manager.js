@@ -88,6 +88,54 @@ class PackageManager {
     const cleanPackageName = this.extractPackageName(packageName);
     return installedPackages.includes(cleanPackageName);
   }
+
+  // ---- command-type tools (non-npm, managed via shell commands) ----
+
+  async runShellCommand(command, timeoutMs = 300000) {
+    try {
+      const { stdout, stderr } = await execAsync(command, { timeout: timeoutMs });
+      return { success: true, output: `${stdout || ''}${stderr || ''}` };
+    } catch (error) {
+      return { success: false, error: error.message, output: `${error.stdout || ''}${error.stderr || ''}` };
+    }
+  }
+
+  // 通过版本命令是否成功执行来判断命令型工具是否已安装
+  async isCommandInstalled(versionCommand) {
+    const result = await this.runShellCommand(versionCommand, 15000);
+    return result.success;
+  }
+
+  // 从版本命令输出中提取语义化版本号（如 "agy version 1.3.1" -> "1.3.1"）
+  async getCommandVersion(versionCommand) {
+    const result = await this.runShellCommand(versionCommand, 15000);
+    if (!result.success) {
+      return null;
+    }
+    const match = result.output.match(/(\d+\.\d+(?:\.\d+)?(?:[-+][0-9A-Za-z.-]+)?)/);
+    return match ? match[1] : null;
+  }
+
+  async installCommandTool(installCommand) {
+    const result = await this.runShellCommand(installCommand, 600000);
+    return result.success
+      ? { success: true, output: result.output }
+      : { success: false, error: result.error };
+  }
+
+  async updateCommandTool(updateCommand) {
+    const result = await this.runShellCommand(updateCommand, 600000);
+    return result.success
+      ? { success: true, output: result.output }
+      : { success: false, error: result.error };
+  }
+
+  async uninstallCommandTool(uninstallCommand) {
+    const result = await this.runShellCommand(uninstallCommand, 300000);
+    return result.success
+      ? { success: true, output: result.output }
+      : { success: false, error: result.error };
+  }
 }
 
 module.exports = { PackageManager };

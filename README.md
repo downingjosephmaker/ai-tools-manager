@@ -61,6 +61,7 @@ The following AI development tools are supported:
 - **Codex** - OpenAI Codex CLI tool
 - **Gemini CLI** - Google Gemini AI command line interface
 - **Antigravity ACP** - ACP server for Google Antigravity's `agy` CLI
+- **Antigravity CLI** - Google Antigravity CLI (`agy`), managed via command type (official installer + `agy update`, not npm)
 - **GLM Coding Agent** - Z.ai (Zhipu) GLM Coding Plan ACP coding agent
 - **Grok Build** - xAI's official Grok coding agent CLI
 - **Copilot CLI** - GitHub Copilot CLI brings the power of Copilot coding agent directly to your terminal
@@ -76,6 +77,14 @@ Tools are configured in `src/tools-config.json`. Each tool entry contains:
 - `description`: Brief description of the tool
 
 To add new tools, edit the configuration file and add new entries to the `tools` array.
+
+Tools are npm packages by default. For tools that are **not distributed via npm** (e.g. the Antigravity CLI), use the `command` type with these optional fields:
+
+- `type`: `"command"` — enables non-npm management
+- `versionCommand`: run to detect the tool (exit code 0 = installed) and read its version
+- `installCommand`: (optional) installs the tool; without it the tool is not offered for installation
+- `updateCommand`: (optional) updates the tool; shown in the Update menu as "check & update" since the latest version cannot be known in advance
+- `uninstallCommand`: (optional) uninstalls the tool; without it the tool is not offered for uninstallation
 
 ## Localization
 

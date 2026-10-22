@@ -30,7 +30,8 @@
     "version": "版本：",
     "upToDate": "（已是最新）",
     "updateAvailable": "→ v%s 可用",
-    "unknownVersion": "未知版本"
+    "unknownVersion": "未知版本",
+    "latestUnknown": "（最新版未知，可用「更新工具」检查）"
   },
   "update": {
     "checking": "正在检查更新...",
@@ -39,11 +40,13 @@
     "noneSelected": "未选择要更新的工具。",
     "updating": "正在更新 %s...",
     "success": "%s 更新成功！",
-    "failed": "更新 %s 失败：%s"
+    "failed": "更新 %s 失败：%s",
+    "checkAndUpdate": "检查并更新"
   },
   "uninstall": {
     "checking": "正在检查已安装的包...",
     "noneInstalled": "当前没有安装配置的工具。",
+    "noneUninstallable": "没有支持通过 ATM 卸载的工具。",
     "selectToUninstall": "选择要卸载的工具：",
     "noneSelected": "未选择要卸载的工具。",
     "confirm": "您确定要卸载 %d 个工具吗？",

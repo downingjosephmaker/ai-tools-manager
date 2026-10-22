@@ -21,6 +21,15 @@
       "description": "ACP server for Google Antigravity's agy CLI"
     },
     {
+      "name": "Antigravity CLI",
+      "package": "agy",
+      "type": "command",
+      "versionCommand": "agy --version",
+      "installCommand": "curl -fsSL https://antigravity.google/cli/install.cmd -o atm-agy-install.cmd && atm-agy-install.cmd && del atm-agy-install.cmd",
+      "updateCommand": "agy update",
+      "description": "Google Antigravity CLI (agy), installed/updated via its own official installer"
+    },
+    {
       "name": "GLM Coding Agent",
       "package": "glm-acp-agent",
       "description": "Z.ai (Zhipu) GLM Coding Plan ACP coding agent"

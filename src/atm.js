@@ -207,11 +207,22 @@ class ATM {
     }
   }
 
+  // command 类型工具：非 npm 分发，通过配置的命令检测/安装/更新
+  isCommandTool(tool) {
+    return tool.type === 'command';
+  }
+
+  async isToolInstalled(tool) {
+    return this.isCommandTool(tool)
+      ? await this.packageManager.isCommandInstalled(tool.versionCommand)
+      : await this.packageManager.isPackageInstalled(tool.package);
+  }
+
   async initializeToolsCache() {
     const spinner = ora(i18n.t('app.initializing')).start();
 
     for (const tool of this.toolsConfig.tools) {
-      const isInstalled = await this.packageManager.isPackageInstalled(tool.package);
+      const isInstalled = await this.isToolInstalled(tool);
       if (isInstalled) {
         this.installedTools.push(tool);
       } else {
@@ -325,7 +336,12 @@ class ATM {
   }
 
   async handleInstall() {
-    if (this.uninstalledTools.length === 0) {
+    // command 类型工具没有配置 installCommand 时无法通过 atm 安装
+    const installableTools = this.uninstalledTools.filter(
+      tool => !this.isCommandTool(tool) || tool.installCommand
+    );
+
+    if (installableTools.length === 0) {
       console.log(chalk.yellow(i18n.t('install.allInstalled')));
       return;
     }
@@ -335,7 +351,7 @@ class ATM {
         type: 'customCheckbox',
         name: 'selectedTools',
         message: `${i18n.t('install.selectToInstall')} ${i18n.t('prompts.pressSpace')}`,
-        choices: this.uninstalledTools.map(tool => ({
+        choices: installableTools.map(tool => ({
           name: `${tool.name} (${tool.package})`,
           value: tool,
           short: tool.name
@@ -350,13 +366,19 @@ class ATM {
 
     for (const tool of selectedTools) {
       const installSpinner = ora(i18n.t('install.installing', tool.name)).start();
-      const result = await this.packageManager.installPackage(tool.package);
+      const result = this.isCommandTool(tool)
+        ? await this.packageManager.installCommandTool(tool.installCommand)
+        : await this.packageManager.installPackage(tool.package);
 
       if (result.success) {
         // Cache version info for newly installed tool while spinner is still showing
         installSpinner.text = i18n.t('install.installing', tool.name) + ' - ' + i18n.t('query.checking');
-        const currentVersion = await this.packageManager.getPackageVersion(tool.package);
-        const latestVersion = await this.packageManager.getLatestVersion(tool.package);
+        const currentVersion = this.isCommandTool(tool)
+          ? await this.packageManager.getCommandVersion(tool.versionCommand)
+          : await this.packageManager.getPackageVersion(tool.package);
+        const latestVersion = this.isCommandTool(tool)
+          ? null
+          : await this.packageManager.getLatestVersion(tool.package);
         this.versionCache.set(tool.package, { currentVersion, latestVersion });
 
         installSpinner.succeed(chalk.green(i18n.t('install.success', tool.name)));
@@ -380,9 +402,15 @@ class ATM {
     // Fetch version info for tools that don't have cached data
     for (const tool of this.installedTools) {
       if (!this.versionCache.has(tool.package)) {
-        const currentVersion = await this.packageManager.getPackageVersion(tool.package);
-        const latestVersion = await this.packageManager.getLatestVersion(tool.package);
-        this.versionCache.set(tool.package, { currentVersion, latestVersion });
+        if (this.isCommandTool(tool)) {
+          // command 型工具无法直接查询最新版本号，由更新命令自行判断
+          const currentVersion = await this.packageManager.getCommandVersion(tool.versionCommand);
+          this.versionCache.set(tool.package, { currentVersion, latestVersion: null });
+        } else {
+          const currentVersion = await this.packageManager.getPackageVersion(tool.package);
+          const latestVersion = await this.packageManager.getLatestVersion(tool.package);
+          this.versionCache.set(tool.package, { currentVersion, latestVersion });
+        }
       }
     }
 
@@ -397,9 +425,11 @@ class ATM {
       const hasUpdate = currentVersion && latestVersion && currentVersion !== latestVersion;
 
       const versionInfo = currentVersion ? `v${currentVersion}` : i18n.t('query.unknownVersion');
-      const updateInfo = hasUpdate
-        ? chalk.yellow(` ${i18n.t('query.updateAvailable', latestVersion)}`)
-        : chalk.green(` ${i18n.t('query.upToDate')}`);
+      const updateInfo = this.isCommandTool(tool)
+        ? chalk.gray(` ${i18n.t('query.latestUnknown')}`)
+        : hasUpdate
+          ? chalk.yellow(` ${i18n.t('query.updateAvailable', latestVersion)}`)
+          : chalk.green(` ${i18n.t('query.upToDate')}`);
 
       console.log(`${chalk.blue('•')} ${chalk.bold(tool.name)} ${chalk.gray(`(${tool.package})`)}`);
       console.log(`  ${chalk.gray(i18n.t('query.version'))} ${versionInfo}${updateInfo}`);
@@ -418,6 +448,23 @@ class ATM {
     // Fetch version info for tools that don't have cached data
     const updatableTools = [];
     for (const tool of this.installedTools) {
+      if (this.isCommandTool(tool)) {
+        // command 型工具：无法预知最新版本号，只要配置了 updateCommand 就允许更新
+        if (tool.updateCommand) {
+          if (!this.versionCache.has(tool.package)) {
+            const currentVersion = await this.packageManager.getCommandVersion(tool.versionCommand);
+            this.versionCache.set(tool.package, { currentVersion, latestVersion: null });
+          }
+          const versionData = this.versionCache.get(tool.package);
+          updatableTools.push({
+            ...tool,
+            currentVersion: versionData?.currentVersion,
+            latestVersion: null
+          });
+        }
+        continue;
+      }
+
       if (!this.versionCache.has(tool.package)) {
         const currentVersion = await this.packageManager.getPackageVersion(tool.package);
         const latestVersion = await this.packageManager.getLatestVersion(tool.package);
@@ -450,7 +497,9 @@ class ATM {
         name: 'selectedTools',
         message: `${i18n.t('update.selectToUpdate')} ${i18n.t('prompts.pressSpace')}`,
         choices: updatableTools.map(tool => ({
-          name: `${tool.name} (v${tool.currentVersion} → v${tool.latestVersion})`,
+          name: this.isCommandTool(tool)
+            ? `${tool.name} (v${tool.currentVersion || '?'} → ${i18n.t('update.checkAndUpdate')})`
+            : `${tool.name} (v${tool.currentVersion} → v${tool.latestVersion})`,
           value: tool,
           short: tool.name
         }))
@@ -464,14 +513,24 @@ class ATM {
 
     for (const tool of selectedTools) {
       const updateSpinner = ora(i18n.t('update.updating', tool.name)).start();
-      const result = await this.packageManager.updatePackage(tool.package);
+      const result = this.isCommandTool(tool)
+        ? await this.packageManager.updateCommandTool(tool.updateCommand)
+        : await this.packageManager.updatePackage(tool.package);
 
       if (result.success) {
         updateSpinner.succeed(chalk.green(i18n.t('update.success', tool.name)));
-        // Update the cached version to latest version
-        const versionData = this.versionCache.get(tool.package);
-        if (versionData) {
-          versionData.currentVersion = versionData.latestVersion;
+        // command 型工具更新后重新读取实际版本；npm 工具直接标记为最新
+        if (this.isCommandTool(tool)) {
+          const newVersion = await this.packageManager.getCommandVersion(tool.versionCommand);
+          const versionData = this.versionCache.get(tool.package);
+          if (versionData && newVersion) {
+            versionData.currentVersion = newVersion;
+          }
+        } else {
+          const versionData = this.versionCache.get(tool.package);
+          if (versionData) {
+            versionData.currentVersion = versionData.latestVersion;
+          }
         }
       } else {
         updateSpinner.fail(chalk.red(i18n.t('update.failed', tool.name, result.error)));
@@ -480,8 +539,13 @@ class ATM {
   }
 
   async handleUninstall() {
-    if (this.installedTools.length === 0) {
-      console.log(chalk.yellow(i18n.t('uninstall.noneInstalled')));
+    // command 型工具未配置 uninstallCommand 时不支持通过 atm 卸载
+    const uninstallableTools = this.installedTools.filter(
+      tool => !this.isCommandTool(tool) || tool.uninstallCommand
+    );
+
+    if (uninstallableTools.length === 0) {
+      console.log(chalk.yellow(i18n.t('uninstall.noneUninstallable')));
       return;
     }
 
@@ -490,7 +554,7 @@ class ATM {
         type: 'customCheckbox',
         name: 'selectedTools',
         message: `${i18n.t('uninstall.selectToUninstall')} ${i18n.t('prompts.pressSpace')}`,
-        choices: this.installedTools.map(tool => ({
+        choices: uninstallableTools.map(tool => ({
           name: `${tool.name} (${tool.package})`,
           value: tool,
           short: tool.name
@@ -519,7 +583,9 @@ class ATM {
 
     for (const tool of selectedTools) {
       const uninstallSpinner = ora(i18n.t('uninstall.uninstalling', tool.name)).start();
-      const result = await this.packageManager.uninstallPackage(tool.package);
+      const result = this.isCommandTool(tool)
+        ? await this.packageManager.uninstallCommandTool(tool.uninstallCommand)
+        : await this.packageManager.uninstallPackage(tool.package);
 
       if (result.success) {
         uninstallSpinner.succeed(chalk.green(i18n.t('uninstall.success', tool.name)));
