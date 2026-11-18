@@ -141,7 +141,7 @@ ATM_SKIP_VERSION_CHECK=true atm
 项目自带一键脚本，会自动完成：卸载旧全局安装（含失效符号链接）→ 打包源码 → 离线安装（本地缓存不全时自动回退联网）→ 验证 → 清理：
 
 ```powershell
-cd I:\ProjectSynthesis\ai-tools-manager
+cd J:\Project\AMy\ai-tools-manager
 .\install-offline.ps1
 
 # 如果被执行策略拦截：
@@ -152,7 +152,7 @@ powershell -ExecutionPolicy Bypass -File .\install-offline.ps1
 
 ```powershell
 npm uninstall -g ai-tools-manager
-cd I:\ProjectSynthesis\ai-tools-manager
+cd J:\Project\AMy\ai-tools-manager
 npm pack --pack-destination .
 $tgz = (Get-ChildItem .\ai-tools-manager-*.tgz | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
 npm install -g $tgz --no-audit --no-fund --offline   # 缓存不全可去掉 --offline 联网安装

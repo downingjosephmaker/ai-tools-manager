@@ -141,7 +141,7 @@ This can be useful for automated scripts or if you're experiencing network issue
 The bundled script does everything for you — it removes the previous global install (including stale symlinks), packs the source, installs fully offline (falling back to online automatically if the local cache is incomplete), verifies, and cleans up:
 
 ```powershell
-cd I:\ProjectSynthesis\ai-tools-manager
+cd J:\Project\AMy\ai-tools-manager
 .\install-offline.ps1
 
 # If blocked by execution policy:
@@ -152,7 +152,7 @@ Manual equivalent (what the script does step by step):
 
 ```powershell
 npm uninstall -g ai-tools-manager
-cd I:\ProjectSynthesis\ai-tools-manager
+cd J:\Project\AMy\ai-tools-manager
 npm pack --pack-destination .
 $tgz = (Get-ChildItem .\ai-tools-manager-*.tgz | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
 npm install -g $tgz --no-audit --no-fund --offline   # drop --offline to allow network
