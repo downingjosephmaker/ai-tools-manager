@@ -116,8 +116,9 @@ class PackageManager {
   }
 
   // 从版本命令输出中提取语义化版本号（如 "agy version 1.3.1" -> "1.3.1"）
-  async getCommandVersion(versionCommand) {
-    const result = await this.runShellCommand(versionCommand, 15000);
+  // timeoutMs：本地命令默认 15s；latestVersionCommand 走网络时可传更长超时
+  async getCommandVersion(versionCommand, timeoutMs = 15000) {
+    const result = await this.runShellCommand(versionCommand, timeoutMs);
     if (!result.success) {
       return null;
     }

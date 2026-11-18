@@ -82,8 +82,9 @@ atm
 
 - `type`：`"command"` —— 启用非 npm 方式管理
 - `versionCommand`：用于检测工具是否安装（退出码 0 即已安装）并读取版本号
+- `latestVersionCommand`：（可选）输出最新发布版本号的命令（如查询 GitHub Releases API）；配置后可显示真实的"有新版本"——未配置或查询失败时显示"最新版未知"
 - `installCommand`：（可选）安装命令；未配置则不出现在安装列表
-- `updateCommand`：（可选）更新命令；因无法预知最新版本号，更新菜单里显示为"检查并更新"
+- `updateCommand`：（可选）更新命令；最新版未知时更新菜单显示"检查并更新"，`latestVersionCommand` 查到最新版后则按版本号正常比对展示
 - `uninstallCommand`：（可选）卸载命令；未配置则不支持通过 ATM 卸载
 
 ## 本地化

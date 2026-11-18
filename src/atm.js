@@ -403,9 +403,13 @@ class ATM {
     for (const tool of this.installedTools) {
       if (!this.versionCache.has(tool.package)) {
         if (this.isCommandTool(tool)) {
-          // command 型工具无法直接查询最新版本号，由更新命令自行判断
+          // command 型工具：当前版本来自 versionCommand；
+          // 配置了 latestVersionCommand 才能知道最新版本（网络查询，超时 30s，失败则视为未知）
           const currentVersion = await this.packageManager.getCommandVersion(tool.versionCommand);
-          this.versionCache.set(tool.package, { currentVersion, latestVersion: null });
+          const latestVersion = tool.latestVersionCommand
+            ? await this.packageManager.getCommandVersion(tool.latestVersionCommand, 30000)
+            : null;
+          this.versionCache.set(tool.package, { currentVersion, latestVersion });
         } else {
           const currentVersion = await this.packageManager.getPackageVersion(tool.package);
           const latestVersion = await this.packageManager.getLatestVersion(tool.package);
@@ -425,7 +429,8 @@ class ATM {
       const hasUpdate = currentVersion && latestVersion && currentVersion !== latestVersion;
 
       const versionInfo = currentVersion ? `v${currentVersion}` : i18n.t('query.unknownVersion');
-      const updateInfo = this.isCommandTool(tool)
+      // command 型工具未配置 latestVersionCommand（或查询失败）时显示"最新版未知"
+      const updateInfo = this.isCommandTool(tool) && !latestVersion
         ? chalk.gray(` ${i18n.t('query.latestUnknown')}`)
         : hasUpdate
           ? chalk.yellow(` ${i18n.t('query.updateAvailable', latestVersion)}`)
@@ -449,18 +454,22 @@ class ATM {
     const updatableTools = [];
     for (const tool of this.installedTools) {
       if (this.isCommandTool(tool)) {
-        // command 型工具：无法预知最新版本号，只要配置了 updateCommand 就允许更新
+        // command 型工具：配置了 latestVersionCommand 且查出最新版时按版本比较，
+        // 已是最新则不列入；无法得知最新版时保持"检查并更新"语义
         if (tool.updateCommand) {
           if (!this.versionCache.has(tool.package)) {
             const currentVersion = await this.packageManager.getCommandVersion(tool.versionCommand);
-            this.versionCache.set(tool.package, { currentVersion, latestVersion: null });
+            const latestVersion = tool.latestVersionCommand
+              ? await this.packageManager.getCommandVersion(tool.latestVersionCommand, 30000)
+              : null;
+            this.versionCache.set(tool.package, { currentVersion, latestVersion });
           }
           const versionData = this.versionCache.get(tool.package);
-          updatableTools.push({
-            ...tool,
-            currentVersion: versionData?.currentVersion,
-            latestVersion: null
-          });
+          const currentVersion = versionData?.currentVersion;
+          const latestVersion = versionData?.latestVersion;
+          if (!latestVersion || !currentVersion || currentVersion !== latestVersion) {
+            updatableTools.push({ ...tool, currentVersion, latestVersion });
+          }
         }
         continue;
       }
@@ -498,7 +507,9 @@ class ATM {
         message: `${i18n.t('update.selectToUpdate')} ${i18n.t('prompts.pressSpace')}`,
         choices: updatableTools.map(tool => ({
           name: this.isCommandTool(tool)
-            ? `${tool.name} (v${tool.currentVersion || '?'} → ${i18n.t('update.checkAndUpdate')})`
+            ? (tool.latestVersion
+              ? `${tool.name} (v${tool.currentVersion || '?'} → v${tool.latestVersion})`
+              : `${tool.name} (v${tool.currentVersion || '?'} → ${i18n.t('update.checkAndUpdate')})`)
             : `${tool.name} (v${tool.currentVersion} → v${tool.latestVersion})`,
           value: tool,
           short: tool.name

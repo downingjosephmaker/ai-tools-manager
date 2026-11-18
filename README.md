@@ -82,8 +82,9 @@ Tools are npm packages by default. For tools that are **not distributed via npm*
 
 - `type`: `"command"` — enables non-npm management
 - `versionCommand`: run to detect the tool (exit code 0 = installed) and read its version
+- `latestVersionCommand`: (optional) prints the latest released version (e.g. a GitHub Releases API query); enables real "update available" checks — without it (or when the query fails) the tool shows "latest unknown"
 - `installCommand`: (optional) installs the tool; without it the tool is not offered for installation
-- `updateCommand`: (optional) updates the tool; shown in the Update menu as "check & update" since the latest version cannot be known in advance
+- `updateCommand`: (optional) updates the tool; shown in the Update menu as "check & update" when the latest version is unknown, or as a normal version-to-version upgrade when `latestVersionCommand` resolved it
 - `uninstallCommand`: (optional) uninstalls the tool; without it the tool is not offered for uninstallation
 
 ## Localization

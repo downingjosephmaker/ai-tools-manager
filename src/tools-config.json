@@ -25,6 +25,7 @@
       "package": "agy",
       "type": "command",
       "versionCommand": "agy --version",
+      "latestVersionCommand": "node -e \"fetch('https://api.github.com/repos/google-antigravity/antigravity-cli/releases/latest').then(r=>r.json()).then(j=>console.log(j.tag_name||'')).catch(()=>{})\"",
       "installCommand": "curl -fsSL https://antigravity.google/cli/install.cmd -o atm-agy-install.cmd && atm-agy-install.cmd && del atm-agy-install.cmd",
       "updateCommand": "agy update",
       "description": "Google Antigravity CLI (agy), installed/updated via its own official installer"
